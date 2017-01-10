@@ -416,6 +416,14 @@ def _file_view(request, repo_id, path):
         send_file_access_msg(request, repo, path, 'web')
         return HttpResponseRedirect(raw_url)
 
+    if fileext == 'html':
+        token = seafile_api.get_fileserver_access_token(repo_id,
+                obj_id, 'view', username, use_onetime=True)
+        raw_url = gen_file_get_url(token, u_filename)
+        send_file_access_msg(request, repo, path, 'web')
+        file_content = urllib2.urlopen(raw_url).read()
+        return HttpResponse(content=file_content, content_type='text/html')
+
     # Get file view raw path, ``user_perm`` is not used anymore.
     if filetype == VIDEO or filetype == AUDIO:
         raw_path, inner_path, user_perm = get_file_view_path_and_perm(
